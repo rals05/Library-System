@@ -1,0 +1,17 @@
+# Eclipse files
+.classpath
+.project
+.settings/
+bin/
+
+# Mac system files
+.DS_Store
+.DS_Store?
+._*
+
+# VS Code files
+.vscode/
+
+# Java compiled files
+*.class
+*.jar
