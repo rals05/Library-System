@@ -1,6 +1,7 @@
 package com.library;
 import java.time.LocalDate;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "borrows")
@@ -10,12 +11,17 @@ public class Borrow {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	@ManyToOne
 	@JoinColumn(name = "book_copy_id")
 	private BookCopy bookCopy;
+
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	@ManyToOne
-	@JoinColumn(name = "member = id")
+	@JoinColumn(name = "member_id")
 	private Member member;
+	
 	private LocalDate borrowDate;
 	private LocalDate dueDate;
 	private LocalDate returnDate;

@@ -13,7 +13,7 @@ public class Branch {
 	private int id;
 	private String name;
 	private String address;
-	OneToMany(mappedBy = "branch")
+	@OneToMany(mappedBy = "branch")
 	private List<BookCopy> bookCopies;
 	
 	//---------- CONSTRUCTORS ----------
@@ -21,8 +21,7 @@ public class Branch {
 
 	}
 	
-	public Branch(int id, String name, String address) {
-		this.id = id;
+	public Branch(String name, String address) {
 		this.name = name;
 		this.address = address;
 		this.bookCopies = new ArrayList<>();

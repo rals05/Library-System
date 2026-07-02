@@ -2,13 +2,12 @@ package com.library;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "people")
+@Table(name = "persons")
 @Inheritance(strategy = InheritanceType.JOINED)
 
 public abstract class Person {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected String name;
 	protected String email;
 	protected String phoneNumber;

@@ -2,7 +2,7 @@ package com.library;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "book-copies")
+@Table(name = "book_copies")
 
 public class BookCopy {
 	
@@ -18,9 +18,9 @@ public class BookCopy {
 	private boolean isAvailable;
 	
 	//---------- CONSTRUCTORS ----------
-	public BookCopy()[
-
-	]
+	public BookCopy(){
+		
+	}
 
 	public BookCopy(Book book, Branch branch) {
 		this.book = book;

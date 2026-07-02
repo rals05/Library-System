@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>library</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        
+        <!------ Navbar ------>
+        <div id = "navbar" style = "display:none">
+            <h2>Library System</h2>
+            <div id = "navbar-buttons"></div>
+        </div>
+        
+        <!------ Login Page ------>
+       <div id = "login-page">
+        <div class = "login-card">
+            <h1>Library System</h1>
+            <input id = "id-input" type = "text" placeholder = "Enter your ID">
+            <button id = "login-button">Login</button>
+            <button id = "register-button">Register as New Member</button>
+        </div>
+       </div>
+
+       <!------ Register Page ------>
+       <div id = "register-page" style = "display:none">
+        <div class = "login-card">
+            <h1>Register</h1>
+            <input id = "reg-name" type = "text" placeholder = "Name">
+            <input id = "reg-email" type = "text" placeholder = "Email">
+            <input id = "reg-phone" type = "text" placeholder = "Phone Number">
+            <button id = "register-submit">Register</button>
+            <button id = "register-back">Back</button>
+        </div>
+       </div>
+
+       <!------ Member Page ------>
+       <div id = "member-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Browse Books</h1>
+            <input id = "search-input" type = "text" placeholder = "Search by title or author">
+            <ul id = "book-list"></ul>
+        </div>
+       </div>
+
+       <!------ Book Details Page ------>
+       <div id = "book-details-page" style = "display:none">
+         <div class = "page-content">
+            <h1>Book Details</h1>
+            <div class = "detail-card">
+                <p id = "detail-title"></p>
+                <p id = "detail-author"></p>
+                <p id = "detail-publisher"></p>
+                <p id = "detail-isbn"></p>
+                <p id = "detail-description"></p>
+                <p id = "detail-copies"></p>
+                <button id = "borrow-button">Borrow</button>
+                <button id = "details-back">Back</button>
+            </div>
+          </div>
+       </div>
+
+       <!------ Return Page ------>
+       <div id = "return-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Return a Book</h1>
+            <ul id = "borrow-list"></ul>
+            <button id = "return-submit">Return Selected Book</button>
+            <button id = "return-back">Back</button>
+        </div>
+       </div>
+
+       <!------ My Books Page ------>
+       <div id = "my-books-page" style = "display:none">
+        <div class = "page-content">
+            <h1>My Borrowed Books</h1>
+            <ul id = "my-books-list"></ul>
+            <button id = "my-books-back">Back</button>
+        </div>
+       </div>
+
+       <!------ Edit Profile ------>
+       <div id = "edit-profile-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Edit Profile</h1>
+            <div class = "form-card">
+                <input id = "edit-name" type = "text" placeholder = "Name">
+                <input id = "edit-email" type = "text" placeholder = "Email">
+                <input id = "edit-phone" type = "text" placeholder = "Phone Number">
+                <button id = "edit-submit">Save Changes</button>
+                <button id = "edit-back">Back</button>
+            </div>
+        </div>
+       </div>
+
+       <!------ Librarian Page ------>
+       <div id = "librarian-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Librarian View</h1>
+            <div class = "action-buttons">
+                <button id = "add-book-button">Add Book</button>
+                <button id = "remove-book-button">Remove Book</button>
+                <button id = "list-books-button">List All Books</button>
+                <button id = "borrowed-list-button">List Borrowed Books</button>
+                <button id = "members-list-button">List All Members</button>
+            </div>
+            <input id = "list-search" type = "text" placeholder = "Search..." style = "display:none">
+            <ul id = "output-list"></ul>
+        </div>
+       </div>
+
+       <!------ Add Book Page ------>
+       <div id = "add-book-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Add New Book</h1>
+            <div class = "form-card">
+                <input id = "book-title" type = "text" placeholder = "Title">
+                <input id = "book-author" type = "text" placeholder = "Author">
+                <input id = "book-publisher" type = "text" placeholder = "Publisher">
+                <input id = "book-isbn" type = "text" placeholder = "ISBN">
+                <textarea id="book-description" placeholder="Description"></textarea>
+                <input id = "book-quantity" type = "number" placeholder = "Number of Copies" min = "1">
+                <button id = "add-book-submit">Add Book</button>
+                <button id = "add-book-back">Back</button>
+            </div>
+        </div>
+       </div>
+
+       <!------ Remove Book Page ------>
+       <div id = "remove-book-page" style = "display:none">
+        <div class = "page-content">
+            <h1>Remove a Book</h1>
+            <ul id = "remove-book-list"></ul>
+            <button id = "remove-book-submit">Remove Book</button>
+            <button id = "remove-book-back">Back</button>
+        </div>
+       </div>
+
+       <!------ Show Book Borrowers Page ------>
+       <div id = "book-borrowers-page" style = "display:none">
+        <div class = "page-content">
+            <h1 id = "book-borrowers-title">Book Borrowers</h1>
+            <p id = "book-borrowers-details"></p>
+            <h2>Currently Borrowed</h2>
+            <ul id = "book-current-borrowers"></ul>
+            <h2>Borrow History</h2>
+            <ul id = "book-borrowers-history"></ul>
+            <button id = "book-borrowers-back">Back</button>
+        </div>
+       </div>
+       
+       <!------ Member History Page ------>
+       <div id = "member-history-page" style = "display:none">
+        <div class = "page-content">
+            <h1 id = "member-history-title">Member History</h1>
+            <h2>Current Borrowed Books</h2>
+            <ul id = "member-current-list"></ul>
+            <h2>Borrow History</h2>
+            <ul id = "member-history-list"></ul>
+            <button id = "member-history-back">Back</button>
+        </div>
+       </div>
+
+       <script src = "app.js"></script>
+
+    </body>
+ </html>
+
+
+
+        

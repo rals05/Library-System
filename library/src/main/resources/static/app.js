@@ -14,11 +14,11 @@ function hideAllPages(){
 }
 
 async function showLoginPage(){
-    await loadData();
     hideAllPages();
     document.getElementById("navbar").style.display = "none";
     document.getElementById("login-page").style.display = "flex";
     document.getElementById("id-input").value = "";
+    await loadData();
 }
 
 document.getElementById("register-button").addEventListener("click", function(){
@@ -105,15 +105,15 @@ function renderBooks(bookArray){
         li.addEventListener("click", function(){
             selectedBook = book;
 
-            let availableCopies = bookCopies.filter(c => c.bookId === book.id && c.isAvailable).length;
-            let totalCopies = bookCopies.filter(c => c.bookId === book.id).length;
+            let availableCopies = bookCopies.filter(c => c.book && c.book.id === book.id && c.isAvailable).length;
+            let totalCopies = bookCopies.filter(c => c.book && c.book.id === book.id).length;
 
             document.getElementById("detail-title").textContent = "Title: " + book.title;
             document.getElementById("detail-author").textContent = "Author: " + book.author;
             document.getElementById("detail-publisher").textContent = "Publisher: " + book.publisher;
             document.getElementById("detail-isbn").textContent = "ISBN: " + book.isbn;
-            document.getElementById("detail-description").textContent = "<strong>Description:</strong> " + (book.description || "No description available");
-            document.getElementById("detail-copies").textContent = "<strong>Available Copies:</strong> " + availableCopies + " / " + totalCopies;
+            document.getElementById("detail-description").innerHTML = "<strong>Description:</strong> " + (book.description || "No description available");
+            document.getElementById("detail-copies").innerHTML = "<strong>Available Copies:</strong> " + availableCopies + " / " + totalCopies;
             
             hideAllPages();
             showMemberNavbar();
@@ -159,21 +159,29 @@ async function loadData() {
 let selectedBook = null;
 let selectedBorrow = null;
 
-document.getElementById("borrow-button").addEventListener("click", function(){
-    let copy = bookCopies.find(c => c.bookId === selectedBook.id && c.isAvailable);
+document.getElementById("borrow-button").addEventListener("click", async function(){
+    let copy = bookCopies.find(c => c.book && c.book.id === selectedBook.id && c.isAvailable);
 
     if(!copy){
         alert("No available copies to borrow");
         return;
     }
 
-    copy.isAvailable = false;
-
     let dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 14);
 
-    borrows.push({ bookCopy: copy, member: currentMember, dueDate: dueDate, returned: false});
+    await fetch('http://localhost:8080/api/borrows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            bookCopy: copy,
+            member: currentMember,
+            borrowedDays: 14
+        })
+    });
 
+    copy.isAvailable = false;
+    await loadData();
     alert("Book Borrowed Successfully! Due Date: " + dueDate.toDateString());
 });
 
@@ -181,16 +189,19 @@ document.getElementById("return-back").addEventListener("click", function(){
     showMemberPage();
 });
 
-document.getElementById("return-submit").addEventListener("click", function(){
+document.getElementById("return-submit").addEventListener("click", async function(){
     if(selectedBorrow === null){
         alert("Select a book to return");
         return;
     }
 
-    selectedBorrow.returned = true;
-    selectedBorrow.bookCopy.isAvailable = true;
-    selectedBorrow = null;
+    await fetch('http://localhost:8080/api/borrows/' + selectedBorrow.id + '/return', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+    });
 
+    selectedBorrow = null;
+    await loadData();
     alert("Book Returned Successfully!");
     showMemberPage();
 });
@@ -204,7 +215,7 @@ function showReturnPage(){
     list.innerHTML = "";
 
     let myBorrows = borrows.filter(function(b){
-        return b.member.membershipNumber === currentMember.membershipNumber && !b.returned;
+        return b.member.membershipNumber === currentMember.membershipNumber && !b.returnDate;
     });
 
     if(myBorrows.length === 0){
@@ -214,8 +225,8 @@ function showReturnPage(){
 
     myBorrows.forEach(function(borrow){
         let li = document.createElement("li");
-        let book = books.find(b => b.id === borrow.bookCopy.bookId);
-        li.textContent = book.title + " | Due: " + borrow.dueDate.toDateString();
+        let book = books.find(b => b.id === borrow.bookCopy.book.id);
+        li.textContent = (book ? book.title : "Unknown") + " | Due: " + (borrow.dueDate || "N/A");
 
         li.addEventListener("click", function(){
             selectedBorrow = borrow;
@@ -244,9 +255,10 @@ function showMyBooks(){
 
     myBorrows.forEach(function(borrow){
         let li = document.createElement("li");
-        li.textContent = "Book ID: " + borrow.bookCopy.bookId + 
-            " | Due: " + borrow.dueDate.toDateString() + 
-            " | Status: " + (borrow.returned ? "Returned" : "Active");
+        let book = books.find(b => b.id === borrow.bookCopy.book.id);
+        li.textContent = (book ? book.title : "Unknown") + 
+            " | Due: " + (borrow.dueDate || "N/A") + 
+            " | Status: " + (borrow.returnDate ? "Returned" : "Active");
         list.appendChild(li);
     });
 }
@@ -314,7 +326,7 @@ document.getElementById("list-books-button").addEventListener("click", function(
                 "<strong>Title:</strong> " + book.title + " &nbsp;|&nbsp; " +
                 "<strong>Author:</strong> " + book.author + " &nbsp;|&nbsp; " +
                 "<strong>ISBN:</strong> " + book.isbn + " &nbsp;|&nbsp; " +
-                "<strong>Copies:</strong> " + bookCopies.filter(c => c.bookId === book.id).length;
+                "<strong>Copies:</strong> " + bookCopies.filter(c => c.book && c.book.id === book.id).length;
             li.addEventListener("click", function(){
                 showBookBorrowers(book);
             });
@@ -329,7 +341,7 @@ document.getElementById("list-books-button").addEventListener("click", function(
             "<strong>Title:</strong> " + book.title + " &nbsp;|&nbsp; " +
             "<strong>Author:</strong> " + book.author + " &nbsp;|&nbsp; " +
             "<strong>ISBN:</strong> " + book.isbn + " &nbsp;|&nbsp; " +
-            "<strong>Copies:</strong> " + bookCopies.filter(c => c.bookId === book.id).length;
+            "<strong>Copies:</strong> " + bookCopies.filter(c => c.book && c.book.id === book.id).length;
         li.addEventListener("click", function(){
             showBookBorrowers(book);
         });
@@ -343,33 +355,16 @@ document.getElementById("borrowed-list-button").addEventListener("click", functi
     search.style.display = "block";
     search.placeholder = "Search borrowed books...";
     search.value = "";
-    search.oninput = function(){
-        let keyword = this.value.toLowerCase();
-        output.innerHTML = "";
-        borrows.filter(b => !b.returned).forEach(function(borrow){
-            let book = books.find(b => b.id === borrow.bookCopy.bookId);
-            if(book.title.toLowerCase().includes(keyword) ||
-               borrow.member.name.toLowerCase().includes(keyword)){
-                let li = document.createElement("li");
-                li.innerHTML =
-                    "<strong>Book:</strong> " + book.title + " &nbsp;|&nbsp; " +
-                    "<strong>Member:</strong> " + borrow.member.name + " &nbsp;|&nbsp; " +
-                    "<strong>ID:</strong> " + borrow.member.membershipNumber + " &nbsp;|&nbsp; " +
-                    "<strong>Due:</strong> " + borrow.dueDate.toDateString();
-                output.appendChild(li);
-            }
-        });
-    };
 
     output.innerHTML = "";
-    borrows.filter(b => !b.returned).forEach(function(borrow){
+    borrows.filter(b => !b.returnDate).forEach(function(borrow){
         let li = document.createElement("li");
-        let book = books.find(b => b.id === borrow.bookCopy.bookId);
+        let book = books.find(b => b.id === borrow.bookCopy.book.id);
         li.innerHTML =
-            "<strong>Book:</strong> " + book.title + " &nbsp;|&nbsp; " +
+            "<strong>Book:</strong> " + (book ? book.title : "Unknown") + " &nbsp;|&nbsp; " +
             "<strong>Member:</strong> " + borrow.member.name + " &nbsp;|&nbsp; " +
             "<strong>ID:</strong> " + borrow.member.membershipNumber + " &nbsp;|&nbsp; " +
-            "<strong>Due:</strong> " + borrow.dueDate.toDateString();
+            "<strong>Due:</strong> " + (borrow.dueDate || "N/A");
         output.appendChild(li);
     });
 });
@@ -392,7 +387,7 @@ document.getElementById("members-list-button").addEventListener("click", functio
                 "<strong>Name:</strong> " + member.name + " &nbsp;|&nbsp; " +
                 "<strong>ID:</strong> " + member.membershipNumber + " &nbsp;|&nbsp; " +
                 "<strong>Email:</strong> " + member.email + " &nbsp;|&nbsp; " +
-                "<strong>Phone:</strong> " + member.phone;
+                "<strong>Phone:</strong> " +  member.phoneNumber;
             li.addEventListener("click", function(){
                 showMemberHistory(member);
             });
@@ -407,7 +402,7 @@ document.getElementById("members-list-button").addEventListener("click", functio
             "<strong>Name:</strong> " + member.name + " &nbsp;|&nbsp; " +
             "<strong>ID:</strong> " + member.membershipNumber + " &nbsp;|&nbsp; " +
             "<strong>Email:</strong> " + member.email + " &nbsp;|&nbsp; " +
-            "<strong>Phone:</strong> " + member.phone;
+            "<strong>Phone:</strong> " +  member.phoneNumber;
         li.addEventListener("click", function(){
             showMemberHistory(member);
         });
@@ -448,6 +443,14 @@ document.getElementById("add-book-submit").addEventListener("click", async funct
     });
     const savedBook = await res.json();
 
+    for(let i = 0; i < quantity; i++){
+        await fetch('http://localhost:8080/api/bookcopies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ book: savedBook, isAvailable: true })
+        });
+    }
+
     await loadData();
     alert("Book Added Successfully!");
     showLibrarianPage();
@@ -480,18 +483,20 @@ document.getElementById("remove-book-button").addEventListener("click", function
     });
 });
 
-document.getElementById("remove-book-submit").addEventListener("click", function(){
+document.getElementById("remove-book-submit").addEventListener("click", async function(){
     if(selectedBookToRemove === null){
         alert("Select a book to remove");
         return;
     }
 
-    books = books.filter(b => b.id !== selectedBookToRemove.id);
-    selectedBookToRemove = null;
+    await fetch('http://localhost:8080/api/books/' + selectedBookToRemove.id, {
+        method: 'DELETE'
+    });
 
+    selectedBookToRemove = null;
+    await loadData();
     alert("Book Removed Successfully!");
-    hideAllPages();
-    document.getElementById("librarian-page").style.display = "block";
+    showLibrarianPage();
 });
 
 document.getElementById("remove-book-back").addEventListener("click", function(){
@@ -517,14 +522,14 @@ function showMemberHistory(member){
     }
 
     memberBorrows.forEach(function(borrow){
-        let book = books.find(b => b.id === borrow.bookCopy.bookId);
+        let book = books.find(b => b.id === borrow.bookCopy.book.id);
         let li = document.createElement("li");
         li.innerHTML =
-            "<strong>Book:</strong> " + book.title + " &nbsp;|&nbsp; " +
-            "<strong>Due:</strong> " + borrow.dueDate.toDateString() + " &nbsp;|&nbsp; " +
-            "<strong>Status:</strong> " + (borrow.returned ? "Returned" : "Active");
+            "<strong>Book:</strong> " + (book ? book.title : "Unknown") + " &nbsp;|&nbsp; " +
+            "<strong>Due:</strong> " + (borrow.dueDate || "N/A") + " &nbsp;|&nbsp; " +
+            "<strong>Status:</strong> " + (borrow.returnDate ? "Returned" : "Active");
 
-        if(!borrow.returned){
+        if(!borrow.returnDate){
             currentList.appendChild(li);
         } else {
             historyList.appendChild(li);
@@ -545,8 +550,8 @@ function showBookBorrowers(book){
     document.getElementById("book-borrowers-page").style.display = "block";
     document.getElementById("book-borrowers-title").textContent = book.title;
 
-    let availableCopies = bookCopies.filter(c => c.bookId === book.id && c.isAvailable).length;
-    let totalCopies = bookCopies.filter(c => c.bookId === book.id).length;
+    let availableCopies = bookCopies.filter(c => c.book && c.book.id === book.id && c.isAvailable).length;
+    let totalCopies = bookCopies.filter(c => c.book && c.book.id === book.id).length;
 
     document.getElementById("book-borrowers-details").innerHTML =
         "<strong>Author:</strong> " + book.author + " &nbsp;|&nbsp; " +
@@ -560,7 +565,7 @@ function showBookBorrowers(book){
     currentList.innerHTML = "";
     historyList.innerHTML = "";
 
-    let bookBorrows = borrows.filter(b => b.bookCopy.bookId === book.id);
+    let bookBorrows = borrows.filter(b => b.bookCopy.book.id === book.id);
 
     if(bookBorrows.length === 0){
         currentList.innerHTML = "<li>Nobody has borrowed this book yet.</li>";
@@ -573,10 +578,10 @@ function showBookBorrowers(book){
         li.innerHTML =
             "<strong>Member:</strong> " + borrow.member.name + " &nbsp;|&nbsp; " +
             "<strong>ID:</strong> " + borrow.member.membershipNumber + " &nbsp;|&nbsp; " +
-            "<strong>Due:</strong> " + borrow.dueDate.toDateString() + " &nbsp;|&nbsp; " +
-            "<strong>Status:</strong> " + (borrow.returned ? "Returned" : "Active");
+            "<strong>Due:</strong> " + (borrow.dueDate || "N/A") + " &nbsp;|&nbsp; " +
+            "<strong>Status:</strong> " + (borrow.returnDate ? "Returned" : "Active");
 
-        if(!borrow.returned){
+        if(!borrow.returnDate){
             currentList.appendChild(li);
         } else {
             historyList.appendChild(li);
@@ -590,3 +595,5 @@ function showBookBorrowers(book){
 document.getElementById("book-borrowers-back").addEventListener("click", function(){
     showLibrarianPage();
 });
+
+loadData();
