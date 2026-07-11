@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 public abstract class Person {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
 	protected String name;
 	protected String email;
 	protected String phoneNumber;
@@ -24,6 +27,10 @@ public abstract class Person {
 	}
 	
 	//---------- GETTERS & SETTERS ----------
+	public Integer getId() {
+		return id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -34,6 +41,10 @@ public abstract class Person {
 	
 	public String getPhoneNumber() {
 		return phoneNumber;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	
 	public void setName(String name) {
