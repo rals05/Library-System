@@ -13,6 +13,7 @@ function hideAllPages(){
     document.getElementById("book-borrowers-page").style.display = "none";
 }
 
+// ---- Login Page ----
 async function showLoginPage(){
     hideAllPages();
     document.getElementById("navbar").style.display = "none";
@@ -21,9 +22,10 @@ async function showLoginPage(){
     await loadData();
 }
 
+// ---- Register Page ----
 document.getElementById("register-button").addEventListener("click", function(){
     hideAllPages();
-    document.getElementById("register-page").style.display = "block";
+    document.getElementById("register-page").style.display = "flex";
 });
 
 document.getElementById("register-submit").addEventListener("click", async function(){
@@ -74,6 +76,7 @@ document.getElementById("login-button").addEventListener("click", function(){
     }
 });
 
+// ---- Member Page ----
 function showMemberPage(){
     hideAllPages();
     showMemberNavbar();
@@ -288,13 +291,22 @@ document.getElementById("my-books-back").addEventListener("click", function(){
     showMemberPage();
 });
 
-function showLibrarianPage(){
+async function showLibrarianPage(){
+
     hideAllPages();
     showLibrarianNavbar();
+
     document.getElementById("librarian-page").style.display = "block";
-    document.getElementById("list-search").value = "none";
-    document.getElementById("list-search").value = "";
-    document.getElementById("output-list").innerHTML = "";
+
+    const response = await fetch("http://localhost:8080/api/dashboard");
+    const stats = await response.json();
+
+    document.getElementById("stat-books").textContent = stats.totalBooks;
+    document.getElementById("stat-copies").textContent = stats.totalCopies;
+    document.getElementById("stat-available").textContent = stats.availableCopies;
+    document.getElementById("stat-borrowed").textContent = stats.borrowedCopies;
+    document.getElementById("stat-members").textContent = stats.totalMembers;
+    document.getElementById("stat-overdue").textContent = stats.overdueBooks;
 }
 
 function showLibrarianNavbar(){

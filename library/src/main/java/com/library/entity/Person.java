@@ -14,16 +14,29 @@ public abstract class Person {
 	protected String name;
 	protected String email;
 	protected String phoneNumber;
+	protected String password;
 	
 	//---------- CONSTRUCTORS ----------
 	public Person(){
 
 	}
 
-	public Person(String name, String email, String phoneNumber) {
+	public Person(String name, String email, String phoneNumber, String password) {
 		this.name = name;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
+		this.password = password;
+	}
+
+    //---------- METHOD ----------
+	protected String generateNumber(String prefix) {
+		StringBuilder sb = new StringBuilder(prefix);
+
+		for(int i = 0; i < 9; i++) {
+			sb.append((int)(Math.random() * 10));
+		}
+
+		return sb.toString();
 	}
 	
 	//---------- GETTERS & SETTERS ----------
@@ -43,6 +56,10 @@ public abstract class Person {
 		return phoneNumber;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -57,6 +74,10 @@ public abstract class Person {
 	
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 }//end class Person

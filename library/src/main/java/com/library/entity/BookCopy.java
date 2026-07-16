@@ -12,20 +12,25 @@ public class BookCopy {
 	@ManyToOne
 	@JoinColumn(name = "book_id")
 	private Book book;
-	@ManyToOne
-	@JoinColumn(name = "branch_id")
-	private Branch branch;
-	private boolean isAvailable;
+	private boolean available;
 	
 	//---------- CONSTRUCTORS ----------
 	public BookCopy(){
 		
 	}
 
-	public BookCopy(Book book, Branch branch) {
+	public BookCopy(Book book) {
 		this.book = book;
-		this.branch = branch;
-		isAvailable = true;
+		this.available = true;
+	}
+
+	//---------- HELPER METHODS ----------
+	public void borrow() {
+		available = false;
+	}
+
+	public void makeAvailable() {
+		available = true;
 	}
 	
 	//---------- GETTERS & SETTERS ----------
@@ -37,12 +42,8 @@ public class BookCopy {
 		return book;
 	}
 	
-	public Branch getBranch() {
-		return branch;
-	}
-	
-	public boolean getIsAvailable() {
-		return isAvailable;
+	public boolean isAvailable() {
+		return available;
 	}
 	
 	public void setId(int id) {
@@ -53,12 +54,8 @@ public class BookCopy {
 		this.book = book;
 	}
 	
-	public void setBranch(Branch branch) {
-		this.branch = branch;
-	}
-	
-	public void setAvailable(Boolean isAvailable) {
-		this.isAvailable = isAvailable;
+	public void setAvailable(boolean available) {
+		this.available = available;
 	}
 
 }//end class BookCopy

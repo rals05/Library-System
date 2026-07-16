@@ -13,18 +13,9 @@ public class Member extends Person {
 
 	}
 
-	public Member(String name, String email, String phoneNumber) {
-		super(name, email, phoneNumber);
-		this.membershipNumber = generateMembershipNumber();
-	}
-	
-	public String generateMembershipNumber() {
-		StringBuilder sb = new StringBuilder("1");
-		int numberOfDigits = 9;
-		for(int i = 0; i < numberOfDigits; i++) {
-			sb.append((int)(Math.random() * 10));
-		}
-		return sb.toString();
+	public Member(String name, String email, String phoneNumber, String password) {
+		super(name, email, phoneNumber, password);
+		this.membershipNumber = generateNumber("1");
 	}
 	
 	//---------- GETTERS & SETTERS ----------

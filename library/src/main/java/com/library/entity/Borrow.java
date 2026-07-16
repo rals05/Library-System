@@ -31,14 +31,15 @@ public class Borrow {
 
 	}
 	
-	public Borrow(BookCopy bookCopy, Member member, int borrowedDays) {
+	public Borrow(BookCopy bookCopy, Member member, int borrowedDurationDays) {
 		this.bookCopy = bookCopy;
 		this.member = member;
 		this.borrowDate = LocalDate.now();
-		this.dueDate = borrowDate.plusDays(borrowedDays);
+		this.dueDate = borrowDate.plusDays(borrowedDurationDays);
+		bookCopy.setAvailable(false);
 	}
 	
-	//---------- METHODS ----------
+	//---------- HELPER METHODS ----------
 	public boolean isReturned() {
 		return returnDate != null;
 	}
@@ -49,6 +50,7 @@ public class Borrow {
 	
 	public void markReturned() {
 		this.returnDate = LocalDate.now();
+	    bookCopy.setAvailable(true);
 	}
 	
 	//---------- GETTERS & SETTERS ----------
